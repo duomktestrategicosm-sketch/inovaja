@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Plataforma de Inovação – Senac Jovem Aprendiz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{ --senac-orange:#F58220; --senac-blue:#0B4DA1; --bg:#ffffff; --ink:#222; --muted:#6b7280; }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; background:var(--bg); color:var(--ink); font-family:'Open Sans',sans-serif;}
+    a{color:var(--senac-blue)}
+    header{display:flex; align-items:center; gap:14px; background:linear-gradient(90deg,#0B4DA1,#0a4aa0); color:#fff; padding:16px}
+    header img{display:block}
+    header .title{line-height:1.1}
+    header h1{margin:0; font-size:22px}
+    header small{opacity:.9}
+    nav{display:flex; justify-content:center; gap:20px; background:#f3f4f6; padding:12px}
+    nav a{color:var(--senac-blue); font-weight:700; text-decoration:none}
+    nav a:hover{text-decoration:underline}
+    main{max-width:1200px; margin:0 auto; padding:20px}
+    section{margin-bottom:40px}
+    h2{color:var(--senac-orange)}
+    .card{border:1px solid #e5e7eb; border-radius:12px; padding:20px; margin:12px 0; background:#fff; box-shadow:0 2px 4px rgba(0,0,0,.05)}
+    button{appearance:none; border:0; padding:10px 16px; border-radius:10px; font-weight:800; cursor:pointer}
+    .btn{background:#f3f4f6; color:#111}
+    .btn:hover{opacity:.95}
+    .primary{background:var(--senac-blue); color:#fff}
+    .orange{background:var(--senac-orange); color:#fff}
+    footer{background:#f9fafb; padding:20px; text-align:center; font-size:14px; color:var(--muted)}
+
+    .video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+    .video-item{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border:1px solid #e5e7eb;border-radius:12px;background:#000}
+    .video-item iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+    .video-actions{display:flex;gap:8px;margin-top:6px}
+    /* ===== Canvas styles ===== */
+    .meta{display:grid; grid-template-columns: 2fr 5fr; gap:12px; margin:12px 0 18px}
+    .meta input{width:100%; padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; font-size:14px}
+    .tools{display:flex; gap:8px; flex-wrap:wrap}
+    .canvas{position:relative; background:#fff; border:2px solid var(--senac-orange); border-radius:16px; padding:14px; display:grid; gap:10px; grid-template-columns: 1.3fr 2.2fr 1.4fr 1.6fr 1.6fr; grid-template-areas:"problema solucao publico efeito viabilidade" "objetivo solucao equipe efeito viabilidade" "beneficios solucao equipe efeito viabilidade" "restricoes restricoes restricoes restricoes restricoes"}
+    .cardCv{border:2px solid var(--senac-orange); border-radius:10px; padding:10px; display:flex; flex-direction:column; min-height:140px; background:#fff}
+    .cardCv header{background:var(--senac-orange); color:#fff; font-weight:800; padding:6px 10px; border-radius:7px; margin:-8px -8px 8px}
+    .cardCv textarea{flex:1; resize:vertical; min-height:90px; border:0; outline:0; padding:8px; font-size:14px}
+    .problema{grid-area:problema}
+    .objetivo{grid-area:objetivo}
+    .beneficios{grid-area:beneficios}
+    .solucao{grid-area:solucao; min-height:430px}
+    .publico{grid-area:publico}
+    .equipe{grid-area:equipe}
+    .efeito{grid-area:efeito}
+    .viabilidade{grid-area:viabilidade}
+    .restricoes{grid-area:restricoes}
+    .note{font-size:12px; color:var(--muted); margin-top:6px}
+  </style>
+</head>
+<body>
+  <header>
+    <img id="logoSenac" alt="Senac" width="38" height="38"/>
+    <div class="title">
+      <h1>Plataforma de Inovação – Senac Jovem Aprendiz</h1>
+      <small>Ambiente de criatividade, empreendedorismo e inovação</small>
+    </div>
+  </header>
+  <nav>
+    <a href="#canvas">Canvas</a>
+    <a href="#aulas">Aulas</a>
+    <a href="#desafios">Desafios</a>
+    <a href="#ranking">Ranking</a>
+    <a href="#perfil">Perfil</a>
+  </nav>
+  <main>
+    <section id="canvas">
+      <h2>Canvas de Projeto</h2>
+      <p>Preencha o modelo oficial do Senac diretamente no navegador, salve e exporte em PDF/JSON ou <strong>envie ao professor</strong>.</p>
+
+      <div class="tools" style="margin:10px 0 6px">
+        <button class="btn" id="btnCvLimpar">Limpar</button>
+        <button class="primary" id="btnCvSalvar">Salvar</button>
+        <button class="orange" id="btnCvPDF">Exportar PDF</button>
+        <button class="btn" id="btnCvExport">Exportar JSON</button>
+        <label class="btn" style="display:inline-flex; align-items:center; gap:8px; cursor:pointer">
+          Importar JSON <input type="file" id="fileCvImport" accept="application/json" style="display:none"/>
+        </label>
+        <button class="primary" id="btnCvSend">Enviar ao professor</button>
+        <span class="note" id="cvStatus">• sem alterações</span>
+      </div>
+
+      <div class="meta">
+        <input id="cv_titulo" placeholder="TÍTULO DO PROJETO" />
+        <input id="cv_descricao" placeholder="BREVE DESCRIÇÃO" />
+      </div>
+
+      <section class="canvas" id="canvasRoot">
+        <article class="cardCv problema"><header>PROBLEMA</header><textarea id="cv_problema" placeholder="Qual necessidade ou desafio você identificou?"></textarea></article>
+        <article class="cardCv objetivo"><header>OBJETIVO SMART</header><textarea id="cv_objetivo" placeholder="Específico, Mensurável, Atingível, Relevante e Temporal"></textarea></article>
+        <article class="cardCv beneficios"><header>BENEFÍCIOS</header><textarea id="cv_beneficios" placeholder="Quais vantagens o projeto traz ao público e à comunidade?"></textarea></article>
+        <article class="cardCv solucao"><header>SOLUÇÃO</header><textarea id="cv_solucao" placeholder="Descreva sua solução/ideia. Se houver MVP, protótipo ou etapas, detalhe aqui."></textarea></article>
+        <article class="cardCv publico"><header>PÚBLICO</header><textarea id="cv_publico" placeholder="Para quem é o projeto? Segmentos e características."></textarea></article>
+        <article class="cardCv equipe"><header>EQUIPE</header><textarea id="cv_equipe" placeholder="Quem faz parte e quais papéis?"></textarea></article>
+        <article class="cardCv efeito"><header>EFEITO SOCIAL, ECONÔMICO, SOCIAL E AMBIENTAL</header><textarea id="cv_efeito" placeholder="Impactos esperados nas dimensões social, econômica e ambiental."></textarea></article>
+        <article class="cardCv viabilidade"><header>VIABILIDADE</header><textarea id="cv_viabilidade" placeholder="Recursos, custos, parceiros e riscos. O projeto pode ser colocado em prática?"></textarea></article>
+        <article class="cardCv restricoes"><header>RESTRIÇÕES</header><textarea id="cv_restricoes" placeholder="Limitações, dependências, prazos e obstáculos."></textarea></article>
+      </section>
+      <div class="note">Dica: o conteúdo é salvo localmente neste navegador (sem servidor). Você pode exportar um arquivo JSON ou PDF a qualquer momento.</div>
+    </section>
+
+    <section id="aulas">
+      <h2>Aulas Interativas</h2>
+      <!-- aulas checklists -->
+      ...
+      <div class="card">
+        <h3>Galeria de Vídeos do Professor</h3>
+        <p class="note">Cole links do YouTube/Vimeo e clique em <strong>Adicionar</strong>. Esses links serão enviados e compartilhados com a turma.</p>
+        <div class="tools" style="margin:8px 0 12px">
+          <input id="videoUrl" placeholder="URL do vídeo" style="flex:1;min-width:240px;padding:10px;border:1px solid #e5e7eb;border-radius:10px"/>
+          <button class="primary" id="btnAddVideo">Adicionar</button>
+          <button class="btn" id="btnClearVideos">Limpar lista local</button>
+          <button class="orange" id="btnPublishVideo">Publicar na turma</button>
+          <button class="btn" id="btnSyncVideos">Carregar vídeos da turma</button>
+        </div>
+        <div id="videosList" class="video-grid"></div>
+      </div>
+    </section>
+
+    <section id="desafios"> ... (como antes) ... </section>
+    <section id="ranking"> ... (como antes) ... </section>
+    <section id="perfil">
+      <h2>Perfil do Aluno</h2>
+      <div class="card">
+        <label>Nome:<br><input id="alunoNome" type="text" placeholder="Seu nome" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:8px"></label>
+        <label style="display:block;margin-top:10px">Turma (código):<br><input id="alunoTurma" type="text" placeholder="Ex.: JA-2025-02" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:8px"></label>
+        <p class="note">Esses dados são usados no envio ao professor e na sincronização de vídeos.</p>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <p>Plataforma de Inovação Senac – Desenvolvida para o Jovem Aprendiz • Santa Maria/RS</p>
+  </footer>
+
+  <!-- libs para PDF -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script>
+    // ===== Config =====
+    // Apps Script: cole a URL se quiser enviar o Canvas e os vídeos para a nuvem
+    const CANVAS_ENDPOINT = ""; // ex.: https://script.google.com/macros/s/SEU-DEPLOY/exec
+    const VIDEOS_CLOUD_ENDPOINT = ""; // ex.: https://script.google.com/macros/s/SEU-DEPLOY/exec
+    const LOGO_URL = ""; // opcional: URL do logo Senac
+
+    // Define logo fallback (ícone vetorial)
+    (function(){ const img=document.getElementById('logoSenac'); if(LOGO_URL){ img.src=LOGO_URL; } else {
+      const svg='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="38" height="38"><path d="M58 20c-8 6-18 9-28 9S10 27 2 20c8-6 18-9 28-9s20 3 28 9Z" fill="#0B4DA1"/><path d="M50 14c-6 5-14 7-22 7S12 19 6 14C12 9 20 7 28 7s16 2 22 7Z" fill="#F58220"/></svg>`);
+      img.src=svg; }
+    })();
+
+    // ===== Canvas: salvar, PDF, JSON, envio =====
+    const CV_KEY='senac_canvas_projeto_v1';
+    const $$=(id)=>document.getElementById(id);
+    const cvFields=['cv_titulo','cv_descricao','cv_problema','cv_objetivo','cv_beneficios','cv_solucao','cv_publico','cv_equipe','cv_efeito','cv_viabilidade','cv_restricoes'];
+    const cvStatus=$$('cvStatus');
+    let cvTimer;
+    function cvSetDirty(){ cvStatus.textContent='• alterações não salvas'; clearTimeout(cvTimer); cvTimer=setTimeout(cvSave,600); }
+    function cvSave(){ const data={}; cvFields.forEach(f=> data[f]=$$(f).value); localStorage.setItem(CV_KEY, JSON.stringify(data)); cvStatus.textContent='• salvo'; }
+    function cvLoad(){ const raw=localStorage.getItem(CV_KEY); if(!raw) return; try{ const data=JSON.parse(raw); cvFields.forEach(f=> { if(data[f]!==undefined) $$(f).value=data[f]; }); }catch(e){} }
+    function cvClear(){ if(!confirm('Limpar todo o conteúdo do Canvas?')) return; cvFields.forEach(f=> $$(f).value=''); localStorage.removeItem(CV_KEY); cvStatus.textContent='• limpo'; }
+    function cvExportJSON(){ const data={}; cvFields.forEach(f=> data[f]=$$(f).value); const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=( $$('#cv_titulo').value?.trim()||'canvas-projeto')+'.json'; a.click(); URL.revokeObjectURL(a.href); }
+    function cvImportJSON(file){ const r=new FileReader(); r.onload=()=>{ try{ const data=JSON.parse(r.result); cvFields.forEach(f=>{ if(data[f]!==undefined) $$(f).value=data[f]; }); cvSave(); }catch(e){ alert('Arquivo inválido.'); } }; r.readAsText(file); }
+    async function cvExportPDF(){ const { jsPDF }=window.jspdf; const node=$$('canvasRoot'); const pdf=new jsPDF({orientation:'landscape',unit:'pt',format:'a4'}); const canvas=await html2canvas(node,{scale:2}); const img=canvas.toDataURL('image/png'); const W=pdf.internal.pageSize.getWidth(); const H=pdf.internal.pageSize.getHeight(); const m=24; const w=W-m*2; const h=(canvas.height/canvas.width)*w; const y=(H-h)/2; pdf.setFont('helvetica','bold'); pdf.setFontSize(14); pdf.text( $$('#cv_titulo').value||'Canvas de Projeto – Senac', m, 24); pdf.addImage(img,'PNG', m, Math.max(36,y), w, h); pdf.save(( $$('#cv_titulo').value?.trim()||'canvas-projeto')+'.pdf'); }
+    async function cvSend(){ if(!CANVAS_ENDPOINT){ alert('Envio desativado: configure CANVAS_ENDPOINT.'); return; } const nome=$$('alunoNome')?.value?.trim()||prompt('Seu nome completo:'); const turma=$$('alunoTurma')?.value?.trim()||prompt('Código da turma:'); if(!nome||!turma) return alert('Preencha nome e turma.'); const payload={ tipo:'canvas', nome, turma, enviadoEm:new Date().toISOString(), projeto:Object.fromEntries(cvFields.map(f=>[f.replace('cv_',''),$$(f).value])) }; try{ const r=await fetch(CANVAS_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); if(!r.ok) throw new Error(await r.text()); alert('Enviado ao professor!'); }catch(err){ alert('Falha no envio: '+err.message); } }
+
+    // Eventos de Canvas
+    cvFields.forEach(f=> $$(f).addEventListener('input', cvSetDirty));
+    $$('#btnCvSalvar').addEventListener('click', cvSave);
+    $$('#btnCvLimpar').addEventListener('click', cvClear);
+    $$('#btnCvExport').addEventListener('click', cvExportJSON);
+    $$('#fileCvImport').addEventListener('change', (e)=> e.target.files[0] && cvImportJSON(e.target.files[0]) );
+    $$('#btnCvPDF').addEventListener('click', cvExportPDF);
+    $$('#btnCvSend').addEventListener('click', cvSend);
+    cvLoad();
+
+    // ===== Vídeos: util =====
+    function ytEmbed(url){
+      try{
+        const u=new URL(url);
+        if(u.hostname.includes('youtube.com')){ const id=u.searchParams.get('v'); if(id) return `https://www.youtube.com/embed/${id}`; }
+        if(u.hostname==='youtu.be'){ return `https://www.youtube.com/embed/${u.pathname.replace('/','')}`; }
+        if(u.hostname.includes('vimeo.com')){ const id=u.pathname.split('/').filter(Boolean).pop(); if(id) return `https://player.vimeo.com/video/${id}`; }
+      }catch{}
+      return '';
+    }
+
+    function askTurma(){ let turma=localStorage.getItem('senac_ie_turma')||''; turma=prompt('Código da turma (ex.: JA-2025-02):', turma||''); if(turma){ localStorage.setItem('senac_ie_turma', turma.trim()); return turma.trim(); } return ''; }
+
+    function renderVideos(list){ const wrap=document.getElementById('videosList'); if(!wrap) return; wrap.innerHTML=''; (list||[]).forEach(v=>{ const box=document.createElement('div'); box.innerHTML=`<div class="video-item"><iframe src="${v.embed}" allowfullscreen></iframe></div>`; wrap.appendChild(box); }); }
+
+    async function syncVideos(){ if(!VIDEOS_CLOUD_ENDPOINT) return alert('Configure VIDEOS_CLOUD_ENDPOINT'); const turma=askTurma(); if(!turma) return; try{ const url=new URL(VIDEOS_CLOUD_ENDPOINT); url.searchParams.set('tipo','video'); url.searchParams.set('turma', turma); const r=await fetch(url.toString()); const data=await r.json(); renderVideos(Array.isArray(data)?data:[]); }catch(err){ alert('Erro ao carregar vídeos: '+err.message); } }
+    async function publishVideo(){ const url=(document.getElementById('videoUrl').value||'').trim(); if(!url) return alert('Cole a URL do vídeo.'); const embed=ytEmbed(url); if(!embed) return alert('URL inválida.'); if(!VIDEOS_CLOUD_ENDPOINT) return alert('Configure VIDEOS_CLOUD_ENDPOINT'); const turma=askTurma(); if(!turma) return; try{ await fetch(VIDEOS_CLOUD_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tipo:'video',turma,url,embed,enviadoEm:new Date().toISOString()})}); document.getElementById('videoUrl').value=''; alert('Vídeo publicado para a turma '+turma); syncVideos(); }catch(err){ alert('Falha ao enviar: '+err.message); } }
+
+    document.getElementById('btnPublishVideo')?.addEventListener('click', publishVideo);
+    document.getElementById('btnSyncVideos')?.addEventListener('click', syncVideos);
+    document.getElementById('btnAddVideo')?.addEventListener('click', publishVideo);
+    document.getElementById('btnClearVideos')?.addEventListener('click', ()=>{ localStorage.removeItem('senac_ie_turma'); alert('Turma limpa do navegador.'); });
+
+    syncVideos();(url){
+      try{
+        const u=new URL(url);
+        if(u.hostname.includes('youtube.com')){ const id=u.searchParams.get('v'); if(id) return `https://www.youtube.com/embed/${id}`; }
+        if(u.hostname==='youtu.be'){ return `https://www.youtube.com/embed/${u.pathname.replace('/','')}`; }
+        if(u.hostname.includes('vimeo.com')){ const id=u.pathname.split('/').filter(Boolean).pop(); if(id) return `https://player.vimeo.com/video/${id}`; }
+      }catch{}
+      return '';
+    }
+
+    function askTurma(){
+      let turma = localStorage.getItem('senac_ie_turma') || '';
+      turma = prompt('Código da turma (ex.: JA-2025-02):', turma || '');
+      if(turma){ localStorage.setItem('senac_ie_turma', turma.trim()); return turma.trim(); }
+      return '';
+    }
+
+    function renderVideos(list){
+      const wrap=document.getElementById('videosList'); if(!wrap) return;
+      wrap.innerHTML='';
+      list.forEach((v,i)=>{
+        const box=document.createElement('div');
+        box.innerHTML = `<div class="video-item"><iframe src="${v.embed}" allowfullscreen></iframe></div>`;
+        wrap.appendChild(box);
+      });
+    }
+
+    async function syncVideos(){
+      if(!VIDEOS_CLOUD_ENDPOINT) return alert('Configure VIDEOS_CLOUD_ENDPOINT');
+      const turma = askTurma(); if(!turma) return;
+      try{
+        const url = new URL(VIDEOS_CLOUD_ENDPOINT);
+        url.searchParams.set('tipo','video');
+        url.searchParams.set('turma', turma);
+        const r = await fetch(url.toString());
+        const data = await r.json();
+        renderVideos(data);
+      }catch(err){ alert('Erro ao carregar vídeos: '+err.message); }
+    }
+
+    async function publishVideo(){
+      const url=(document.getElementById('videoUrl').value||'').trim();
+      if(!url) return alert('Cole a URL do vídeo.');
+      const embed=ytEmbed(url);
+      if(!embed) return alert('URL inválida.');
+      if(!VIDEOS_CLOUD_ENDPOINT) return alert('Configure VIDEOS_CLOUD_ENDPOINT');
+      const turma = askTurma(); if(!turma) return;
+      try{
+        await fetch(VIDEOS_CLOUD_ENDPOINT, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tipo:'video',turma,url,embed,enviadoEm:new Date().toISOString()})});
+        document.getElementById('videoUrl').value='';
+        alert('Vídeo publicado para a turma '+turma);
+        syncVideos();
+      }catch(err){ alert('Falha ao enviar: '+err.message); }
+    }
+
+    document.getElementById('btnPublishVideo')?.addEventListener('click', publishVideo);
+    document.getElementById('btnSyncVideos')?.addEventListener('click', syncVideos);
+    document.getElementById('btnAddVideo')?.addEventListener('click', publishVideo);
+    document.getElementById('btnClearVideos')?.addEventListener('click', ()=>{ localStorage.removeItem('senac_ie_turma'); alert('Turma limpa do navegador.'); });
+
+    // Carregar inicialmente
+    syncVideos();
+  </script>
+</body>
+</html>
